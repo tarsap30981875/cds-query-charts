@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CDS Query & Charts</title>
+  <title>Ask Finnie — SAP Analytics & Insights</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -469,7 +469,7 @@ function App() {
   // ─── Chat state ──────────────────────────────────────────────────
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Hi! Ask me anything about your CDS data. For example:\n\n"Show me all bill rates"\n"What projects do we have?"\n"Show invoice data for last month"' }
+    { role: 'assistant', content: 'Hi! I\'m Finnie, your SAP Analytics assistant. Ask me anything about your data. For example:\n\n"Show me all bill rates"\n"What projects do we have?"\n"Show invoice data for last month"' }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
@@ -541,8 +541,8 @@ function App() {
     // Header
     h('header', { className: 'app-header' },
       h('div', { className: 'brand' },
-        h('div', { className: 'brand-icon' }, '◇'),
-        h('h1', null, 'CDS ', h('span', null, 'Query'), ' & Charts')
+        h('div', { className: 'brand-icon' }, 'F'),
+        h('h1', null, 'Ask ', h('span', null, 'Finnie'))
       ),
       h('div', { className: 'header-right' },
         h('div', { className: 'conn-badge' },
@@ -553,7 +553,7 @@ function App() {
         h('button', {
           className: 'btn-chat-toggle' + (chatOpen ? ' active' : ''),
           onClick: () => setChatOpen(prev => !prev)
-        }, '\u2728 AI Chat')
+        }, '\u2728 Ask Finnie')
       )
     ),
 
@@ -721,8 +721,8 @@ function App() {
     h('div', { className: 'chat-pane' + (chatOpen ? ' open' : '') },
       h('div', { className: 'chat-header' },
         h('div', { className: 'chat-header-left' },
-          h('div', { className: 'chat-header-icon' }, '\u2728'),
-          h('h3', null, 'AI ', h('span', null, 'Chat'))
+          h('div', { className: 'chat-header-icon' }, 'F'),
+          h('h3', null, 'Ask ', h('span', null, 'Finnie'))
         ),
         h('button', { className: 'btn-close-chat', onClick: () => setChatOpen(false) }, '\u2715')
       ),
@@ -752,7 +752,7 @@ function App() {
             value: chatInput,
             onChange: e => setChatInput(e.target.value),
             onKeyDown: handleChatKey,
-            placeholder: 'Ask about your CDS data\u2026',
+            placeholder: 'Ask Finnie about your data\u2026',
             rows: 1,
             disabled: chatLoading
           }),

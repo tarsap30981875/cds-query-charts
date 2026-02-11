@@ -1,14 +1,16 @@
-# CDS Query & Charts
+# Ask Finnie — SAP Analytics & Insights
 
-A professional web UI to **connect** to SAP S/4, **query CDS models**, and **generate interactive charts** from the results.
+**Ask Finnie** is a professional web application that lets you **connect** to SAP S/4, **query CDS models** using natural language or SQL, and **generate interactive charts** from the results — all powered by AI.
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![Recharts](https://img.shields.io/badge/Recharts-2-22b5bf)
+![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai&logoColor=white)
 
 ## Features
 
+- **Ask Finnie (AI Chat)** — query your SAP data in plain English; Finnie generates SQL, runs it, and suggests charts
 - **Live connection status** to SAP S/4 system
 - **CDS model selector** — pick from the bundled views, or switch to **Custom SQL**
 - **Configurable query** — max rows, decode toggle
