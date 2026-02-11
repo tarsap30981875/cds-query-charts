@@ -16,6 +16,12 @@ A professional web UI to **connect** to SAP S/4, **query CDS models**, and **gen
 - **Charts** — Bar, Line, Area, Pie with configurable X/Y axes
 - **Dark theme** — modern design with teal accent
 
+## One-Click Deploy to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/tarsap30981875/cds-query-charts)
+
+Click the button above, then set the three required environment variables (`SAP_URL`, `SAP_USER`, `SAP_PASSWORD`) in the Render dashboard.
+
 ## Quick Start (local)
 
 ```bash
