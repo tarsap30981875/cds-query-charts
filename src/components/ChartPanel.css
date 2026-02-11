@@ -1,0 +1,96 @@
+.chart-panel-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.chart-controls .field.inline label {
+  min-width: 4rem;
+}
+
+.y-keys-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.chip:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.chip input {
+  accent-color: var(--accent);
+}
+
+.chip input:checked + span {
+  color: var(--accent);
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 280px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+}
+
+.chart-empty,
+.chart-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.9rem;
+}
+
+.chart-placeholder {
+  min-height: 320px;
+}
+
+/* Recharts overrides for dark theme */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border);
+}
+
+.recharts-text {
+  fill: var(--text-secondary);
+}
+
+.recharts-legend-item-text {
+  fill: var(--text-primary) !important;
+}
+
+.recharts-default-tooltip {
+  padding: 0.5rem 0.75rem !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+}

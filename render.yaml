@@ -1,0 +1,22 @@
+services:
+  - type: web
+    runtime: node
+    name: cds-query-charts
+    plan: free
+    buildCommand: npm install --ignore-scripts
+    startCommand: node server/index.js
+    envVars:
+      - key: SAP_URL
+        sync: false
+      - key: SAP_USER
+        sync: false
+      - key: SAP_PASSWORD
+        sync: false
+      - key: SAP_CLIENT
+        value: "100"
+      - key: SAP_LANGUAGE
+        value: EN
+      - key: CDS_SOURCE_PATH
+        value: ./cds-views
+      - key: PORT
+        value: "10000"

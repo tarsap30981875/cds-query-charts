@@ -1,0 +1,40 @@
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  color: var(--text-secondary);
+}
+
+.status-ok {
+  color: var(--success);
+}
+
+.status-fail {
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-retry {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.btn-retry:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}

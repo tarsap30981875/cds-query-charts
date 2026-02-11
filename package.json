@@ -1,0 +1,20 @@
+{
+  "name": "cds-query-ui",
+  "version": "1.0.0",
+  "description": "Professional UI to connect, query CDS models, and generate charts",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "abap-adt-api": "^6.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.0"
+  }
+}

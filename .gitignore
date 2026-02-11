@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+cloudflared.exe
+share.bat
+share.ps1
+tunnel.js
