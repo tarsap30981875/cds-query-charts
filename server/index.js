@@ -94,13 +94,19 @@ app.get('/api/connection', async (req, res) => {
   } catch (err) {
     const msg = err.message || 'Connection failed';
     // Surface common causes for easier troubleshooting
-    const hint =
+    let hint =
       msg.includes('ECONNREFUSED') ? ' SAP may be down or the URL/port is wrong.'
       : msg.includes('ETIMEDOUT') || msg.includes('timed out') ? ' Network/firewall may be blocking; try from the same network as SAP.'
       : msg.includes('401') || msg.includes('Unauthorized') ? ' Check SAP_USER and SAP_PASSWORD in .env.'
       : msg.includes('403') || msg.includes('Forbidden') ? ' User may lack authorization or wrong SAP_CLIENT.'
       : msg.includes('certificate') || msg.includes('UNABLE_TO_VERIFY') ? ' SSL certificate issue; ensure createSSLConfig(true) is used.'
       : '';
+    // On Render (cloud), outbound connections to on-premise SAP typically fail — explain and suggest fixes
+    const isRender = process.env.RENDER === 'true';
+    const isNetworkError = /ECONNREFUSED|ETIMEDOUT|ENOTFOUND|timed out|getaddrinfo|ECONNRESET/i.test(msg);
+    if (isRender && isNetworkError) {
+      hint = ' Render runs in the cloud and cannot reach on-premise or firewall-protected SAP. To use SAP: deploy this app inside your corporate network (e.g. on a server with VPN), or expose your SAP system to the internet if policy allows. See README "Render + SAP".';
+    }
     res.status(503).json({ ok: false, message: msg + hint });
   }
 });

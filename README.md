@@ -45,11 +45,27 @@ npm start
 3. Connect the GitHub repo
 4. Render detects `render.yaml` automatically
 5. Set **environment variables** in the Render dashboard:
-   - `SAP_URL` — your SAP system URL
+   - `SAP_URL` — your SAP system URL (see **Render + SAP** below if connection fails)
    - `SAP_USER` — SAP username
    - `SAP_PASSWORD` — SAP password
-   - `GROQ_API_KEY` — Groq API key (free at console.groq.com)
+   - `OPENAI_API_KEY` or `GROQ_API_KEY` — for Ask Finnie chat
 6. Deploy!
+
+### Render + SAP connection
+
+**If the app on Render shows "SAP: Not connected"** — Render runs in the **cloud**. Your SAP system (e.g. `s4hnpn.sap.mckinsey.com`) is usually **on-premise or behind a corporate firewall**, so Render’s servers **cannot reach it** (connection refused or timeout).
+
+**Options:**
+
+| Option | When to use |
+|--------|-------------|
+| **Deploy inside your network** | Run the app on a server that can reach SAP (e.g. a VM or container with VPN, or on the same network as SAP). Build and run with `npm install && npm start`, then share the internal URL. |
+| **Expose SAP to the internet** | If your security policy allows, make the SAP system reachable from the internet (e.g. via reverse proxy / DMZ). Then set `SAP_URL` on Render to that public URL. |
+| **Use Render for UI only** | Deploy on Render for the shareable UI; SAP features will show "Not connected." Use Ask Finnie (LLM) and Custom SQL only when you run the app locally with SAP credentials. |
+
+**Quick fix for a shareable demo without SAP:** Deploy on Render as-is. The app will still load; only the SAP connection will fail. You can document that "SAP queries work when run locally; on Render the app is for UI/demo."
+
+**To get SAP working with a shareable URL:** Deploy the app **inside your network** (server with VPN or same network as SAP). See **[DEPLOY-IN-NETWORK.md](DEPLOY-IN-NETWORK.md)** for step-by-step instructions (Docker, Node.js, or Windows server).
 
 ## Environment Variables
 
@@ -66,8 +82,8 @@ npm start
 | `OPENAI_API_KEY` | Yes* | — | Required when `LLM_PROVIDER=openai` |
 | `OPENAI_MODEL` | No | `gpt-4o-mini` | OpenAI model when using OpenAI |
 | `OPENAI_API_BASE` | No | — | Optional custom base URL (e.g. Azure, OpenRouter) |
-| `CDS_SOURCE_PATH` | No | `./cds-views` | Path to `.ddls.abap` files |
-| `PORT` | No | `3001` | Server port |
+| `CDS_SOURCE_PATH` | No | `./cds-views` | Path to `.ddls.abap` files (on Render use `./cds-views` or leave default) |
+| `PORT` | No | `3001` | Server port (Render sets this automatically) |
 
 ## API
 
