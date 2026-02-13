@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node server/index.js",
     "server": "node server/index.js",
-    "dev": "node server/index.js"
+    "dev": "node server/index.js",
+    "build": "npm install --ignore-scripts"
   },
   "dependencies": {
     "abap-adt-api": "^6.0.1",

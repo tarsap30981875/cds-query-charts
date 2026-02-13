@@ -5,14 +5,21 @@
 import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
-import { ADTClient, createSSLConfig } from 'abap-adt-api';
+import { ADTClient, createSSLConfig, session_types } from 'abap-adt-api';
 import OpenAI from 'openai';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CDS_EXT = '.ddls.abap';
+
+// Normalize SAP base URL: trim and remove trailing slash (avoids double slashes)
+function normalizeSapUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  return url.trim().replace(/\/+$/, '');
+}
 
 // ─── SAP ADT client (lazy init) ─────────────────────────────────────
 let adtClient = null;
@@ -21,21 +28,28 @@ function getAdtClient() {
   if (adtClient) return adtClient;
   const missing = ['SAP_URL', 'SAP_USER', 'SAP_PASSWORD'].filter((k) => !process.env[k]);
   if (missing.length) throw new Error(`Missing env: ${missing.join(', ')}`);
+  const baseUrl = normalizeSapUrl(process.env.SAP_URL);
   adtClient = new ADTClient(
-    process.env.SAP_URL,
-    process.env.SAP_USER,
+    baseUrl,
+    process.env.SAP_USER.trim(),
     process.env.SAP_PASSWORD,
-    process.env.SAP_CLIENT || '100',
-    process.env.SAP_LANGUAGE || 'EN',
-    createSSLConfig(true)
+    String(process.env.SAP_CLIENT || '100'),
+    String(process.env.SAP_LANGUAGE || 'EN'),
+    createSSLConfig(true) // allow corporate/self-signed certificates
   );
-  adtClient.stateful = 'stateful';
+  adtClient.stateful = session_types.stateful;
   return adtClient;
+}
+
+// Resolve CDS source directory: relative paths are from project root (parent of server/)
+function getCdsBasePath() {
+  const raw = process.env.CDS_SOURCE_PATH || path.join(__dirname, '..', 'cds-views');
+  return path.isAbsolute(raw) ? raw : path.resolve(path.join(__dirname, '..'), raw);
 }
 
 // ─── Local CDS view list (from zanalytics-cds) ───────────────────────
 function listLocalCdsViews() {
-  const basePath = path.resolve(process.env.CDS_SOURCE_PATH || path.join(__dirname, '..', 'cds-views'));
+  const basePath = getCdsBasePath();
   const views = [];
   function scan(dir) {
     if (!fs.existsSync(dir)) return;
@@ -64,14 +78,30 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(publicPath));
 }
 
+// Connection check timeout (ms) — avoid hanging if SAP is unreachable
+const CONNECTION_CHECK_TIMEOUT_MS = 25000;
+
 // ─── API: Connection check ──────────────────────────────────────────
 app.get('/api/connection', async (req, res) => {
   try {
     const client = getAdtClient();
-    await client.reentranceTicket();
+    const ticketPromise = client.reentranceTicket();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. Check SAP_URL, network, and firewall.')), CONNECTION_CHECK_TIMEOUT_MS)
+    );
+    await Promise.race([ticketPromise, timeoutPromise]);
     res.json({ ok: true, message: 'Connected' });
   } catch (err) {
-    res.status(503).json({ ok: false, message: err.message || 'Connection failed' });
+    const msg = err.message || 'Connection failed';
+    // Surface common causes for easier troubleshooting
+    const hint =
+      msg.includes('ECONNREFUSED') ? ' SAP may be down or the URL/port is wrong.'
+      : msg.includes('ETIMEDOUT') || msg.includes('timed out') ? ' Network/firewall may be blocking; try from the same network as SAP.'
+      : msg.includes('401') || msg.includes('Unauthorized') ? ' Check SAP_USER and SAP_PASSWORD in .env.'
+      : msg.includes('403') || msg.includes('Forbidden') ? ' User may lack authorization or wrong SAP_CLIENT.'
+      : msg.includes('certificate') || msg.includes('UNABLE_TO_VERIFY') ? ' SSL certificate issue; ensure createSSLConfig(true) is used.'
+      : '';
+    res.status(503).json({ ok: false, message: msg + hint });
   }
 });
 
@@ -88,40 +118,72 @@ app.get('/api/cds-views', (req, res) => {
 // ─── API: Run query ──────────────────────────────────────────────────
 app.post('/api/query', async (req, res) => {
   try {
+    const body = req.body;
+    if (!body || typeof body !== 'object') {
+      return res.status(400).json({ error: 'Request body must be JSON with type, and ddicEntityName or sqlQuery.' });
+    }
     const client = getAdtClient();
-    const { type, ddicEntityName, sqlQuery, rowNumber = 500, decode = true } = req.body;
+    const { type, ddicEntityName, sqlQuery, rowNumber = 500, decode = true } = body;
 
     if (type === 'tableContents') {
-      if (!ddicEntityName) return res.status(400).json({ error: 'ddicEntityName required' });
-      const result = await client.tableContents(ddicEntityName, rowNumber, decode, sqlQuery || undefined);
+      const name = (ddicEntityName != null && String(ddicEntityName).trim()) ? String(ddicEntityName).trim() : '';
+      if (!name) return res.status(400).json({ error: 'Select a CDS view first, or switch to Custom SQL and enter a query.' });
+      const result = await client.tableContents(name, rowNumber, decode, sqlQuery || undefined);
       return res.json({ status: 'success', result });
     }
 
     if (type === 'runQuery') {
-      if (!sqlQuery) return res.status(400).json({ error: 'sqlQuery required' });
-      const result = await client.runQuery(sqlQuery, rowNumber, decode);
+      const q = (sqlQuery != null && String(sqlQuery).trim()) ? String(sqlQuery).trim() : '';
+      if (!q) return res.status(400).json({ error: 'Enter a SQL query in the Custom SQL box.' });
+      const result = await client.runQuery(q, rowNumber, decode);
       return res.json({ status: 'success', result });
     }
 
-    res.status(400).json({ error: 'Invalid type; use tableContents or runQuery' });
+    res.status(400).json({ error: 'Invalid type. Use "tableContents" (CDS view) or "runQuery" (custom SQL).' });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Query failed' });
   }
 });
 
-// ─── OpenAI client (lazy) ────────────────────────────────────────────
-let openaiClient = null;
-function getOpenAI() {
-  if (openaiClient) return openaiClient;
-  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.startsWith('sk-PASTE'))
-    throw new Error('OPENAI_API_KEY not configured in .env');
-  openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  return openaiClient;
+// ─── LLM client (Groq or OpenAI — switch to avoid Groq accessibility issues)
+// Set LLM_PROVIDER=openai to use OpenAI instead of Groq (e.g. when Groq is blocked by firewall).
+let llmClient = null;
+let llmModel = null;
+
+function getLLM() {
+  if (llmClient) return { client: llmClient, model: llmModel };
+
+  const provider = (process.env.LLM_PROVIDER || 'groq').toLowerCase();
+
+  if (provider === 'openai') {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key || key.startsWith('sk-PASTE'))
+      throw new Error('OPENAI_API_KEY not configured. Set it in .env or use LLM_PROVIDER=groq with GROQ_API_KEY.');
+    llmClient = new OpenAI({
+      apiKey: key,
+      baseURL: process.env.OPENAI_API_BASE || undefined, // optional custom base (e.g. Azure, OpenRouter)
+      timeout: 60000,
+    });
+    llmModel = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  } else {
+    // default: Groq
+    const key = process.env.GROQ_API_KEY;
+    if (!key || key.startsWith('PASTE'))
+      throw new Error('GROQ_API_KEY not configured in .env — get a free key at https://console.groq.com');
+    llmClient = new OpenAI({
+      apiKey: key,
+      baseURL: 'https://api.groq.com/openai/v1',
+      timeout: 60000,
+    });
+    llmModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  }
+
+  return { client: llmClient, model: llmModel };
 }
 
 // Read CDS view sources for AI context
 function readCdsViewSource(viewName) {
-  const basePath = path.resolve(process.env.CDS_SOURCE_PATH || path.join(__dirname, '..', 'cds-views'));
+  const basePath = getCdsBasePath();
   const filePath = path.join(basePath, viewName + CDS_EXT);
   if (fs.existsSync(filePath)) return fs.readFileSync(filePath, 'utf-8');
   // try subfolders
@@ -184,25 +246,31 @@ RESPONSE FORMAT — you MUST respond with valid JSON (no markdown, no code fence
 
 If the user is asking a general question (not a data query), set sql to null and just provide an explanation.`;
 
-// ─── API: Chat (NLP to SQL) ──────────────────────────────────────────
+// ─── API: Chat (NLP to SQL via Groq or OpenAI) ───────────────────────
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, history = [] } = req.body;
-    if (!message) return res.status(400).json({ error: 'message required' });
+    const body = req.body;
+    if (!body || typeof body !== 'object') {
+      return res.status(400).json({ error: 'Request body must be JSON with a "message" field.' });
+    }
+    const { message, history = [] } = body;
+    const msg = (message != null && String(message).trim()) ? String(message).trim() : '';
+    if (!msg) return res.status(400).json({ error: 'Type a message in the Ask Finnie chat box.' });
 
-    const ai = getOpenAI();
-    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+    const { client, model } = getLLM();
     const cdsContext = buildCdsContext();
     const systemMsg = SYSTEM_PROMPT.replace('{CDS_CONTEXT}', cdsContext);
 
-    // Build conversation
+    // Build messages — standard OpenAI chat format (system + history + user)
     const messages = [
       { role: 'system', content: systemMsg },
-      ...history.slice(-10).map(m => ({ role: m.role, content: m.content })),
-      { role: 'user', content: message }
+      ...history.slice(-10)
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .map(m => ({ role: m.role, content: m.content })),
+      { role: 'user', content: msg }
     ];
 
-    const completion = await ai.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model,
       messages,
       temperature: 0.2,
@@ -246,7 +314,33 @@ app.post('/api/chat', async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ error: err.message || 'Chat failed' });
+    // Prefer API error body (OpenAI returns err.response?.data?.error?.message)
+    const apiError = err.response?.data?.error?.message || err.response?.data?.error;
+    const msg = (typeof apiError === 'string' ? apiError : null) || err.message || 'Chat failed';
+    console.error('[Finnie chat]', err.response?.status || '', msg, err.response?.data ? '(see below)' : '');
+    if (err.response?.data) console.error('[Finnie chat] API response:', JSON.stringify(err.response.data, null, 2));
+
+    // Friendly messages for common errors
+    if (msg.includes('429') || msg.includes('rate_limit') || msg.includes('Too Many Requests')) {
+      return res.status(429).json({ error: 'Rate limit reached. Wait a moment and try again.' });
+    }
+    if (err.response?.status === 401 || msg.includes('401') || msg.includes('invalid_api_key') || msg.includes('Unauthorized') || msg.includes('Incorrect API key')) {
+      const provider = (process.env.LLM_PROVIDER || 'groq').toLowerCase();
+      return res.status(401).json({
+        error: (provider === 'openai' ? 'OpenAI' : 'Groq') + ' API key is invalid or expired. Check ' + (provider === 'openai' ? 'OPENAI_API_KEY' : 'GROQ_API_KEY') + ' in .env. Get a key at platform.openai.com or console.groq.com.',
+      });
+    }
+    if (err.response?.status === 404 || msg.includes('404') || (msg.includes('model') && (msg.includes('not found') || msg.includes('does not exist')))) {
+      return res.status(400).json({ error: 'Invalid model. In .env set OPENAI_MODEL to gpt-4o-mini or gpt-4o (or use Groq: LLM_PROVIDER=groq and GROQ_MODEL=llama-3.3-70b-versatile).' });
+    }
+    // Connection/network errors — often firewall, proxy, or DNS
+    if (msg.includes('Connection error') || msg.includes('ECONNREFUSED') || msg.includes('ECONNRESET') || msg.includes('ETIMEDOUT') || msg.includes('fetch failed') || msg.includes('ENOTFOUND')) {
+      const provider = (process.env.LLM_PROVIDER || 'groq').toLowerCase();
+      return res.status(502).json({
+        error: 'Cannot reach ' + (provider === 'openai' ? 'OpenAI' : 'Groq') + ' API. Check internet/VPN/firewall. Try LLM_PROVIDER=groq with GROQ_API_KEY if OpenAI is blocked.',
+      });
+    }
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -259,7 +353,15 @@ app.get('*', (req, res) => {
   else res.status(404).send('No UI found. Run npm run build or add public/index.html');
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\nPort ${PORT} is already in use. Either:\n  - Stop the other process using port ${PORT}, or\n  - Set a different PORT in .env (e.g. PORT=4001)\n`);
+    process.exit(1);
+  }
+  throw err;
+});
+server.listen(PORT, () => {
   console.log(`CDS Query UI server at http://localhost:${PORT}`);
-  console.log(`CDS views path: ${process.env.CDS_SOURCE_PATH || path.join(__dirname, '..', 'cds-views')}`);
+  console.log(`CDS views path: ${getCdsBasePath()}`);
 });

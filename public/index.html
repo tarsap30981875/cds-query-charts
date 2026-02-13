@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/recharts@2.15.0/umd/Recharts.js"></script>
   <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       DESIGN TOKENS
+       ═══════════════════════════════════════════════════════════════════ */
     :root {
       --bg-primary: #0a0f1a;
       --bg-secondary: #111827;
@@ -39,6 +39,9 @@
       --transition: 0.2s ease;
     }
 
+    /* ═══════════════════════════════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════════════════════════════ */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font-sans);
@@ -46,14 +49,15 @@
       color: var(--text-primary);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
     #root { min-height: 100vh; }
     button { font-family: var(--font-sans); cursor: pointer; }
     input, select, textarea { font-family: var(--font-sans); }
     code, .mono { font-family: var(--font-mono); }
 
-    /* ─── Layout ─── */
+    /* ═══════════════════════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════════════════════ */
     .app { min-height: 100vh; display: flex; flex-direction: column; }
 
     .app-header {
@@ -61,7 +65,6 @@
       padding: 0.9rem 1.5rem;
       background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(8px);
       position: sticky; top: 0; z-index: 50;
     }
     .brand { display: flex; align-items: center; gap: 0.65rem; }
@@ -80,13 +83,15 @@
     .conn-dot.ok { background: var(--success); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
     .conn-dot.fail { background: var(--error); box-shadow: 0 0 8px rgba(248,113,113,0.5); }
     .conn-dot.pending { background: var(--warning); animation: pulse 1.2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
     .btn-retry {
       padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 500;
       background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm);
       color: var(--text-secondary); transition: var(--transition);
     }
     .btn-retry:hover { border-color: var(--accent); color: var(--accent); }
+
     .btn-chat-toggle {
       padding: 0.4rem 0.75rem; font-size: 0.82rem; font-weight: 600;
       background: linear-gradient(135deg, #5c7cfa, #6366f1);
@@ -100,22 +105,18 @@
     .app-main {
       flex: 1; display: grid;
       grid-template-columns: 380px 1fr;
-      grid-template-rows: 1fr;
-      gap: 0;
-      overflow: hidden;
+      gap: 0; overflow: hidden;
     }
 
-    /* ─── Left sidebar ─── */
+    /* ═══════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════════════════════════ */
     .sidebar {
       background: var(--bg-secondary);
       border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      overflow-y: auto;
+      display: flex; flex-direction: column; overflow-y: auto;
     }
-    .sidebar-section {
-      padding: 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
+    .sidebar-section { padding: 1.25rem; border-bottom: 1px solid var(--border); }
     .sidebar-section:last-child { border-bottom: none; }
 
     .section-title {
@@ -123,7 +124,6 @@
       color: var(--text-muted); margin-bottom: 0.75rem;
     }
 
-    /* ─── Mode tabs ─── */
     .mode-tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
     .mode-tab {
       flex: 1; padding: 0.5rem; font-size: 0.82rem; font-weight: 500;
@@ -136,7 +136,6 @@
       box-shadow: 0 2px 8px var(--accent-glow);
     }
 
-    /* ─── Fields ─── */
     .field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; }
     .field:last-child { margin-bottom: 0; }
     .field label { font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); }
@@ -145,22 +144,21 @@
     .input {
       padding: 0.55rem 0.75rem;
       background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--text-primary); font-size: 0.88rem; transition: var(--transition);
-      width: 100%;
+      color: var(--text-primary); font-size: 0.88rem; transition: var(--transition); width: 100%;
     }
     .input:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
     .input::placeholder { color: var(--text-muted); }
-
-    select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237b8faa' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem; }
+    select.input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237b8faa' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem;
+    }
     select.input option { background: var(--bg-secondary); color: var(--text-primary); }
-
     textarea.input { resize: vertical; min-height: 90px; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.5; }
-
     .input-number { width: 80px; text-align: center; }
 
     .checkbox-wrap { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; }
     .checkbox-wrap input { accent-color: var(--accent); width: 15px; height: 15px; }
-
     .options-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
 
     .btn-run {
@@ -169,8 +167,7 @@
       color: var(--bg-primary); border: none; border-radius: var(--radius-sm);
       box-shadow: 0 3px 12px var(--accent-glow); transition: var(--transition);
     }
-    .btn-run:hover:not(:disabled) { background: linear-gradient(135deg, var(--accent-hover), var(--accent)); transform: translateY(-1px); box-shadow: 0 4px 16px var(--accent-glow); }
-    .btn-run:active:not(:disabled) { transform: translateY(0); }
+    .btn-run:hover:not(:disabled) { background: linear-gradient(135deg, var(--accent-hover), var(--accent)); transform: translateY(-1px); }
     .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .error-box {
@@ -179,7 +176,9 @@
       color: var(--error); font-size: 0.82rem; line-height: 1.4; word-break: break-word;
     }
 
-    /* ─── Content area ─── */
+    /* ═══════════════════════════════════════════════════════════════════
+       CONTENT AREA
+       ═══════════════════════════════════════════════════════════════════ */
     .content { display: flex; flex-direction: column; overflow: hidden; }
     .content-tabs {
       display: flex; gap: 0; border-bottom: 1px solid var(--border);
@@ -197,16 +196,14 @@
       padding: 0.1rem 0.4rem; font-size: 0.7rem; font-weight: 600;
       background: var(--bg-hover); border-radius: 99px; color: var(--text-secondary);
     }
-
     .tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
-    /* ─── Results table ─── */
+    /* Results table */
     .results-empty {
       flex: 1; display: flex; align-items: center; justify-content: center;
       color: var(--text-muted); font-size: 0.95rem; padding: 3rem; text-align: center;
     }
     .results-empty svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.3; }
-
     .results-scroll { flex: 1; overflow: auto; }
     .results-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     .results-table th, .results-table td {
@@ -219,7 +216,6 @@
     }
     .results-table tbody tr:hover td { background: var(--bg-hover); }
     .results-table td { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
-
     .results-footer {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0.5rem 1rem; border-top: 1px solid var(--border);
@@ -228,10 +224,9 @@
 
     .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .loading-bar { display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem; }
 
-    /* ─── Charts ─── */
+    /* Charts */
     .chart-config {
       display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem;
       border-bottom: 1px solid var(--border); background: var(--bg-secondary);
@@ -239,7 +234,6 @@
     .chart-config .field { margin-bottom: 0; }
     .chart-config .field label { font-size: 0.72rem; }
     .chart-config select.input { min-width: 120px; }
-
     .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
     .chip {
       display: inline-flex; align-items: center; gap: 0.3rem;
@@ -250,17 +244,14 @@
     .chip:hover { border-color: var(--text-secondary); color: var(--text-primary); }
     .chip.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
     .chip input { display: none; }
-
     .chart-area {
       flex: 1; display: flex; align-items: center; justify-content: center;
       padding: 1.5rem; min-height: 350px;
     }
-    .chart-placeholder {
-      text-align: center; color: var(--text-muted); font-size: 0.9rem;
-    }
+    .chart-placeholder { text-align: center; color: var(--text-muted); font-size: 0.9rem; }
 
-    /* ─── Recharts theme ─── */
-    .recharts-cartesian-grid-horizontal line, .recharts-cartesian-grid-vertical line { stroke: var(--border); }
+    .recharts-cartesian-grid-horizontal line,
+    .recharts-cartesian-grid-vertical line { stroke: var(--border); }
     .recharts-text { fill: var(--text-secondary) !important; }
     .recharts-legend-item-text { fill: var(--text-primary) !important; color: var(--text-primary) !important; }
     .recharts-default-tooltip {
@@ -268,7 +259,9 @@
       border-radius: var(--radius-sm) !important; box-shadow: var(--shadow) !important;
     }
 
-    /* ─── Chat pane ─── */
+    /* ═══════════════════════════════════════════════════════════════════
+       CHAT PANE
+       ═══════════════════════════════════════════════════════════════════ */
     .chat-pane {
       position: fixed; top: 0; right: 0; bottom: 0; width: 420px;
       background: var(--bg-secondary); border-left: 1px solid var(--border);
@@ -277,7 +270,6 @@
       box-shadow: -8px 0 40px rgba(0,0,0,0.5);
     }
     .chat-pane.open { transform: translateX(0); }
-
     .chat-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
@@ -297,28 +289,21 @@
       color: var(--text-secondary); font-size: 1rem; transition: var(--transition);
     }
     .btn-close-chat:hover { border-color: var(--error); color: var(--error); }
-
     .chat-messages {
       flex: 1; overflow-y: auto; padding: 1rem;
       display: flex; flex-direction: column; gap: 0.75rem;
     }
     .chat-msg { max-width: 92%; animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
     .chat-msg.user { align-self: flex-end; }
     .chat-msg.assistant { align-self: flex-start; }
-
-    .chat-bubble {
-      padding: 0.65rem 0.85rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.5;
-    }
+    .chat-bubble { padding: 0.65rem 0.85rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; }
     .chat-msg.user .chat-bubble {
-      background: linear-gradient(135deg, #5c7cfa, #6366f1); color: #fff;
-      border-bottom-right-radius: 4px;
+      background: linear-gradient(135deg, #5c7cfa, #6366f1); color: #fff; border-bottom-right-radius: 4px;
     }
     .chat-msg.assistant .chat-bubble {
-      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);
-      border-bottom-left-radius: 4px;
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); border-bottom-left-radius: 4px;
     }
-
     .chat-sql {
       margin-top: 0.5rem; padding: 0.5rem 0.65rem;
       background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -326,32 +311,26 @@
       white-space: pre-wrap; word-break: break-all;
     }
     .chat-sql-label { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
-
     .chat-data-badge {
       display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.4rem;
       padding: 0.25rem 0.5rem; background: rgba(0,201,183,0.1); border: 1px solid rgba(0,201,183,0.3);
       border-radius: 99px; font-size: 0.72rem; color: var(--accent); cursor: pointer; transition: var(--transition);
     }
     .chat-data-badge:hover { background: rgba(0,201,183,0.2); }
-
     .chat-error-badge {
       margin-top: 0.4rem; padding: 0.3rem 0.5rem;
       background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3);
       border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--error);
     }
-
     .chat-typing { display: flex; gap: 4px; padding: 0.5rem 0; align-self: flex-start; }
     .chat-typing span {
-      width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%;
-      animation: bounce 1.2s infinite;
+      width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: bounce 1.2s infinite;
     }
     .chat-typing span:nth-child(2) { animation-delay: 0.15s; }
     .chat-typing span:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
-
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
     .chat-input-area {
-      padding: 0.75rem 1rem; border-top: 1px solid var(--border);
-      background: var(--bg-card); flex-shrink: 0;
+      padding: 0.75rem 1rem; border-top: 1px solid var(--border); background: var(--bg-card); flex-shrink: 0;
     }
     .chat-input-row { display: flex; gap: 0.5rem; }
     .chat-input {
@@ -364,411 +343,492 @@
     .btn-send {
       padding: 0.6rem 1rem; font-size: 0.88rem; font-weight: 600;
       background: linear-gradient(135deg, #5c7cfa, #6366f1);
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      transition: var(--transition); white-space: nowrap;
+      color: #fff; border: none; border-radius: var(--radius-sm); transition: var(--transition); white-space: nowrap;
     }
     .btn-send:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(92,124,250,0.4); }
     .btn-send:disabled { opacity: 0.45; cursor: not-allowed; }
-
     .chat-hint { margin-top: 0.5rem; font-size: 0.72rem; color: var(--text-muted); }
 
-    /* ─── Responsive ─── */
+    /* ═══════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════ */
     @media (max-width: 900px) {
-      .app-main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+      .app-main { grid-template-columns: 1fr; }
       .sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; }
       .chat-pane { width: 100%; }
+    }
+
+    /* Error overlay */
+    #boot-error {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg-primary); color: var(--error);
+      font-family: var(--font-mono); font-size: 0.9rem;
+      padding: 2rem; white-space: pre-wrap; overflow: auto;
     }
   </style>
 </head>
 <body>
-<div id="root"></div>
+
+<!-- Visible immediately while JS loads -->
+<div id="root">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;color:#7b8faa;font-family:system-ui;gap:0.75rem">
+    <div style="width:20px;height:20px;border:2px solid #2a3650;border-top-color:#00c9b7;border-radius:50%;animation:spin 0.7s linear infinite"></div>
+    Loading Ask Finnie...
+  </div>
+</div>
+<div id="boot-error"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CDN LIBRARIES  (React 18.2 + Recharts 2.12.7)
+     ═══════════════════════════════════════════════════════════════════ -->
 <script>
-// ─── React app (no build step) ──────────────────────────────────────
-const { useState, useEffect, useCallback, useMemo, useRef, createElement: h, Fragment } = React;
-const {
-  BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} = Recharts;
+  // Track CDN load failures
+  window.__cdnFail = [];
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"
+        crossorigin onerror="window.__cdnFail.push('React 18')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"
+        crossorigin onerror="window.__cdnFail.push('ReactDOM 18')"></script>
+<!-- Recharts UMD expects window.PropTypes — full shim for production -->
+<script>
+(function(){
+  var noop = function(){};
+  noop.isRequired = noop;
+  var shim = function(){ return noop; };
+  shim.isRequired = noop;
+  var PT = {
+    array: shim, bigint: shim, bool: shim, func: shim, number: shim,
+    object: shim, string: shim, symbol: shim, any: shim, element: shim,
+    elementType: shim, node: shim,
+    arrayOf: shim, instanceOf: shim, objectOf: shim,
+    oneOf: shim, oneOfType: shim, shape: shim, exact: shim,
+    checkPropTypes: noop, resetWarningCache: noop, PropTypes: null
+  };
+  PT.PropTypes = PT;
+  window.PropTypes = PT;
+})();
+</script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"
+        crossorigin onerror="window.__cdnFail.push('Recharts')"></script>
 
-const COLORS = ['#00c9b7','#5c7cfa','#f59f00','#ec4899','#10b981','#6366f1','#f97316','#14b8a6'];
-const CHART_TYPES = ['bar','line','area','pie'];
-
-// ─── Helpers ─────────────────────────────────────────────────────────
-function normalizeResult(result) {
-  if (!result) return { columns: [], rows: [] };
-  const rawCols = result.columns || [];
-  const colNames = rawCols.map(c => typeof c === 'string' ? c : (c && c.name) || '');
-  let rows = result.values || result.rows || [];
-  if (rows.length && Array.isArray(rows[0]) && colNames.length) {
-    rows = rows.map(arr => colNames.reduce((o, n, i) => { o[n] = arr[i]; return o; }, {}));
+<!-- ═══════════════════════════════════════════════════════════════════
+     BOOT CHECK — abort early if React/ReactDOM failed to load
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  var fatal = [];
+  if (typeof React === 'undefined') fatal.push('React');
+  if (typeof ReactDOM === 'undefined') fatal.push('ReactDOM');
+  if (fatal.length) {
+    var e = document.getElementById('boot-error');
+    e.style.display = 'block';
+    e.textContent = 'Could not load: ' + fatal.concat(window.__cdnFail).join(', ')
+      + '\n\nPossible causes:'
+      + '\n  - No internet connection'
+      + '\n  - CDN blocked by firewall / proxy'
+      + '\n  - Ad-blocker interference'
+      + '\n\nTry refreshing (Ctrl+Shift+R) or check DevTools console (F12).';
+    document.getElementById('root').innerHTML = '';
+    throw new Error('Fatal: missing ' + fatal.join(', '));
   }
-  const cols = colNames.length ? colNames : (rows[0] ? Object.keys(rows[0]) : []);
-  return { columns: cols, rows };
-}
+})();
+</script>
 
-// ─── App ─────────────────────────────────────────────────────────────
-function App() {
-  const [connected, setConnected] = useState(null);
-  const [views, setViews] = useState([]);
-  const [selectedView, setSelectedView] = useState('');
-  const [mode, setMode] = useState('tableContents');
-  const [sql, setSql] = useState('');
-  const [rowLimit, setRowLimit] = useState(500);
-  const [decode, setDecode] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [rawResult, setRawResult] = useState(null);
-  const [activeTab, setActiveTab] = useState('table');
-  const [chartType, setChartType] = useState('bar');
-  const [xKey, setXKey] = useState('');
-  const [yKeys, setYKeys] = useState([]);
+<!-- ═══════════════════════════════════════════════════════════════════
+     APPLICATION
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
 
-  const checkConn = useCallback(async () => {
-    setConnected(null);
-    try {
-      const r = await fetch('/api/connection');
-      const d = await r.json();
-      setConnected(!!d.ok);
-    } catch { setConnected(false); }
-  }, []);
+  /* ── React imports ─────────────────────────────────────────────── */
+  var R = React;
+  var h = R.createElement;
+  var F = R.Fragment;
+  var useState    = R.useState;
+  var useEffect   = R.useEffect;
+  var useCallback = R.useCallback;
+  var useMemo     = R.useMemo;
+  var useRef      = R.useRef;
 
-  const loadViews = useCallback(async () => {
-    try {
-      const r = await fetch('/api/cds-views');
-      const d = await r.json();
-      setViews(d.views || []);
-    } catch { setViews([]); }
-  }, []);
+  /* ── Recharts (optional — app works without it) ────────────────── */
+  var RC = (typeof Recharts !== 'undefined') ? Recharts : null;
+  var HAS_CHARTS = !!RC;
 
-  useEffect(() => { checkConn(); loadViews(); }, []);
+  /* ── Constants ─────────────────────────────────────────────────── */
+  var COLORS = ['#00c9b7','#5c7cfa','#f59f00','#ec4899','#10b981','#6366f1','#f97316','#14b8a6'];
+  var CHART_TYPES = ['bar','line','area','pie'];
 
-  const { columns, rows } = useMemo(() => normalizeResult(rawResult), [rawResult]);
-
-  const numericCols = useMemo(() =>
-    columns.filter(c => rows.length && !isNaN(Number(rows[0][c]))),
-    [columns, rows]
-  );
-
-  const runQuery = async () => {
-    setError(null); setRawResult(null); setLoading(true);
-    try {
-      const body = mode === 'tableContents'
-        ? { type: 'tableContents', ddicEntityName: selectedView, rowNumber: rowLimit, decode }
-        : { type: 'runQuery', sqlQuery: sql, rowNumber: rowLimit, decode };
-      const r = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Query failed');
-      setRawResult(d.result);
-      setActiveTab('table');
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
-  };
-
-  const toggleY = (col) => setYKeys(prev => prev.includes(col) ? prev.filter(k => k !== col) : [...prev, col]);
-
-  // ─── Chat state ──────────────────────────────────────────────────
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: 'Hi! I\'m Finnie, your SAP Analytics assistant. Ask me anything about your data. For example:\n\n"Show me all bill rates"\n"What projects do we have?"\n"Show invoice data for last month"' }
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const chatEndRef = useRef(null);
-
-  useEffect(() => {
-    if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages, chatLoading]);
-
-  const sendChat = async () => {
-    const msg = chatInput.trim();
-    if (!msg || chatLoading) return;
-    setChatInput('');
-    const userMsg = { role: 'user', content: msg };
-    setChatMessages(prev => [...prev, userMsg]);
-    setChatLoading(true);
-    try {
-      const history = chatMessages.filter(m => m.role === 'user' || (m.role === 'assistant' && !m.data));
-      const r = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, history })
+  /* ── Helpers ────────────────────────────────────────────────────── */
+  function normalizeResult(result) {
+    if (!result) return { columns: [], rows: [] };
+    var rawCols = result.columns || [];
+    var colNames = rawCols.map(function(c) { return typeof c === 'string' ? c : (c && c.name) || ''; });
+    var rows = result.values || result.rows || [];
+    if (rows.length && Array.isArray(rows[0]) && colNames.length) {
+      rows = rows.map(function(arr) {
+        return colNames.reduce(function(o, n, i) { o[n] = arr[i]; return o; }, {});
       });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Chat failed');
-      const reply = d.reply || {};
-      setChatMessages(prev => [...prev, {
-        role: 'assistant',
-        content: reply.explanation || 'Done.',
-        sql: reply.sql,
-        data: reply.data,
-        queryError: reply.queryError,
-        chartSuggestion: reply.chartSuggestion,
-        viewName: reply.viewName,
-      }]);
-      // If the AI returned data, load it into the main panel too
-      if (reply.data) {
-        setRawResult(reply.data);
-        setActiveTab('table');
-        if (reply.chartSuggestion && reply.chartSuggestion.type !== 'none') {
-          setChartType(reply.chartSuggestion.type || 'bar');
-          if (reply.chartSuggestion.xKey) setXKey(reply.chartSuggestion.xKey);
-          if (reply.chartSuggestion.yKeys) setYKeys(reply.chartSuggestion.yKeys);
-        }
-      }
-    } catch (e) {
-      setChatMessages(prev => [...prev, { role: 'assistant', content: 'Error: ' + e.message }]);
-    } finally {
-      setChatLoading(false);
     }
-  };
+    var cols = colNames.length ? colNames : (rows[0] ? Object.keys(rows[0]) : []);
+    return { columns: cols, rows: rows };
+  }
 
-  const handleChatKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } };
+  /* ═════════════════════════════════════════════════════════════════
+     MAIN APP COMPONENT
+     ═════════════════════════════════════════════════════════════════ */
+  function App() {
+    /* ── Query state ────────────────────────────────────────────── */
+    var _conn      = useState(null);     var connected = _conn[0];     var setConnected = _conn[1];
+    var _connErr   = useState('');       var connError = _connErr[0]; var setConnError = _connErr[1];
+    var _views     = useState([]);       var views = _views[0];        var setViews = _views[1];
+    var _sel       = useState('');       var selectedView = _sel[0];   var setSelectedView = _sel[1];
+    var _mode      = useState('tableContents'); var mode = _mode[0];   var setMode = _mode[1];
+    var _sql       = useState('');       var sql = _sql[0];            var setSql = _sql[1];
+    var _limit     = useState(500);      var rowLimit = _limit[0];     var setRowLimit = _limit[1];
+    var _dec       = useState(true);     var decode = _dec[0];         var setDecode = _dec[1];
+    var _load      = useState(false);    var loading = _load[0];       var setLoading = _load[1];
+    var _err       = useState(null);     var error = _err[0];          var setError = _err[1];
+    var _raw       = useState(null);     var rawResult = _raw[0];      var setRawResult = _raw[1];
+    var _tab       = useState('table');  var activeTab = _tab[0];      var setActiveTab = _tab[1];
+    var _ct        = useState('bar');    var chartType = _ct[0];       var setChartType = _ct[1];
+    var _xk        = useState('');       var xKey = _xk[0];            var setXKey = _xk[1];
+    var _yk        = useState([]);       var yKeys = _yk[0];           var setYKeys = _yk[1];
 
-  const loadChatData = (msg) => {
-    if (msg.data) {
-      setRawResult(msg.data);
-      setActiveTab('table');
+    /* ── Chat state ─────────────────────────────────────────────── */
+    var _co        = useState(false);    var chatOpen = _co[0];        var setChatOpen = _co[1];
+    var _cm        = useState([{ role:'assistant', content:"Hi! I'm Finnie, your SAP Analytics assistant. Ask me anything about your data. For example:\n\n\"Show me all bill rates\"\n\"What projects do we have?\"\n\"Show invoice data for last month\"" }]);
+    var chatMessages = _cm[0]; var setChatMessages = _cm[1];
+    var _ci        = useState('');       var chatInput = _ci[0];       var setChatInput = _ci[1];
+    var _cl        = useState(false);    var chatLoading = _cl[0];     var setChatLoading = _cl[1];
+    var chatEndRef = useRef(null);
+
+    /* ── Derived data ───────────────────────────────────────────── */
+    var normalized = useMemo(function() { return normalizeResult(rawResult); }, [rawResult]);
+    var columns = normalized.columns;
+    var rows    = normalized.rows;
+    var numericCols = useMemo(function() {
+      return columns.filter(function(c) { return rows.length && !isNaN(Number(rows[0][c])); });
+    }, [columns, rows]);
+
+    /* ── Effects ────────────────────────────────────────────────── */
+    var checkConn = useCallback(function() {
+      setConnected(null);
+      setConnError('');
+      fetch('/api/connection').then(function(r) { return r.json(); })
+        .then(function(d) {
+          setConnected(!!d.ok);
+          if (!d.ok && d.message) setConnError(d.message);
+        })
+        .catch(function(e) { setConnected(false); setConnError('Cannot reach server. Run npm start and open http://localhost:4000'); });
+    }, []);
+
+    var loadViews = useCallback(function() {
+      fetch('/api/cds-views').then(function(r) { return r.json(); })
+        .then(function(d) { setViews(d.views || []); })
+        .catch(function() { setViews([]); });
+    }, []);
+
+    useEffect(function() { checkConn(); loadViews(); }, []);
+
+    useEffect(function() {
+      if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, [chatMessages, chatLoading]);
+
+    /* ── Actions ────────────────────────────────────────────────── */
+    function runQuery() {
+      setError(null); setRawResult(null); setLoading(true);
+      var body = mode === 'tableContents'
+        ? { type: 'tableContents', ddicEntityName: selectedView, rowNumber: rowLimit, decode: decode }
+        : { type: 'runQuery', sqlQuery: sql, rowNumber: rowLimit, decode: decode };
+      fetch('/api/query', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+        .then(function(r) {
+          return r.json().then(function(d) { if (!r.ok) throw new Error(d.error || 'Query failed'); return d; })
+            .catch(function() { if (!r.ok) throw new Error('Query failed (' + r.status + '). Check SAP connection.'); throw new Error('Invalid response'); });
+        })
+        .then(function(d) { setRawResult(d.result); setActiveTab('table'); })
+        .catch(function(e) { setError(e.message || 'Something went wrong. Check SAP connection and try again.'); })
+        .finally(function() { setLoading(false); });
+    }
+
+    function toggleY(col) { setYKeys(function(prev) { return prev.indexOf(col)>=0 ? prev.filter(function(k){return k!==col}) : prev.concat(col); }); }
+
+    function sendChat() {
+      var msg = chatInput.trim();
+      if (!msg || chatLoading) return;
+      setChatInput('');
+      setChatMessages(function(prev) { return prev.concat({ role:'user', content: msg }); });
+      setChatLoading(true);
+      var history = chatMessages.filter(function(m){ return m.role==='user'||(m.role==='assistant'&&!m.data); });
+      fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message: msg, history: history }) })
+        .then(function(r) {
+          return r.json().then(function(d) { if (!r.ok) throw new Error(d.error || 'Chat failed'); return d; })
+            .catch(function() { if (!r.ok) throw new Error('Chat failed (' + r.status + '). Check LLM settings in .env.'); throw new Error('Invalid response from server'); });
+        })
+        .then(function(d) {
+          var reply = d.reply || {};
+          setChatMessages(function(prev) { return prev.concat({
+            role:'assistant', content: reply.explanation||'Done.',
+            sql: reply.sql, data: reply.data, queryError: reply.queryError,
+            chartSuggestion: reply.chartSuggestion, viewName: reply.viewName
+          }); });
+          if (reply.data) {
+            setRawResult(reply.data); setActiveTab('table');
+            if (reply.chartSuggestion && reply.chartSuggestion.type !== 'none') {
+              setChartType(reply.chartSuggestion.type || 'bar');
+              if (reply.chartSuggestion.xKey) setXKey(reply.chartSuggestion.xKey);
+              if (reply.chartSuggestion.yKeys) setYKeys(reply.chartSuggestion.yKeys);
+            }
+          }
+        })
+        .catch(function(e) {
+          var friendly = (e && e.message) ? e.message : 'Chat failed. Check .env (OPENAI_API_KEY or GROQ_API_KEY) and try again.';
+          if (e && (e.message === 'Failed to fetch' || e.name === 'TypeError')) {
+            friendly = 'Cannot reach server. Run npm start and open http://localhost:' + (window.location.port || '4000') + ' in the browser.';
+          }
+          setChatMessages(function(prev) { return prev.concat({ role:'assistant', content: 'Error: ' + friendly }); });
+        })
+        .finally(function() { setChatLoading(false); });
+    }
+
+    function handleChatKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+
+    function loadChatData(msg) {
+      if (!msg.data) return;
+      setRawResult(msg.data); setActiveTab('table');
       if (msg.chartSuggestion && msg.chartSuggestion.type !== 'none') {
         setChartType(msg.chartSuggestion.type || 'bar');
         if (msg.chartSuggestion.xKey) setXKey(msg.chartSuggestion.xKey);
         if (msg.chartSuggestion.yKeys) setYKeys(msg.chartSuggestion.yKeys);
       }
     }
-  };
 
-  // ─── Render ────────────────────────────────────────────────────────
-  return h('div', { className: 'app' },
-    // Header
-    h('header', { className: 'app-header' },
-      h('div', { className: 'brand' },
-        h('div', { className: 'brand-icon' }, 'F'),
-        h('h1', null, 'Ask ', h('span', null, 'Finnie'))
-      ),
-      h('div', { className: 'header-right' },
-        h('div', { className: 'conn-badge' },
-          h('span', { className: 'conn-dot ' + (connected === null ? 'pending' : connected ? 'ok' : 'fail') }),
-          connected === null ? 'Checking...' : connected ? 'Connected' : 'Not connected',
-          !connected && connected !== null && h('button', { className: 'btn-retry', onClick: checkConn }, 'Retry')
+    /* ── Chart builder (only when Recharts loaded) ──────────────── */
+    function renderChart() {
+      if (!HAS_CHARTS) return h('div',{className:'chart-area'}, h('div',{className:'chart-placeholder'}, 'Charts library unavailable. Table & Chat still work.'));
+      if (!xKey || !yKeys.length) return h('div',{className:'chart-area'}, h('div',{className:'chart-placeholder'}, 'Select an X axis and at least one Y measure.'));
+
+      var margin = { top:10, right:20, left:0, bottom:0 };
+      var inner;
+      if (chartType === 'pie') {
+        inner = h(RC.PieChart, null,
+          h(RC.Pie, { data:rows, dataKey:yKeys[0], nameKey:xKey, cx:'50%', cy:'50%', outerRadius:'70%', label:true },
+            rows.map(function(_,i){ return h(RC.Cell, { key:i, fill:COLORS[i%COLORS.length] }); })
+          ), h(RC.Tooltip), h(RC.Legend));
+      } else if (chartType === 'area') {
+        inner = h(RC.AreaChart, { data:rows, margin:margin },
+          h(RC.CartesianGrid, {strokeDasharray:'3 3'}), h(RC.XAxis, {dataKey:xKey, fontSize:11}), h(RC.YAxis, {fontSize:11}),
+          h(RC.Tooltip), h(RC.Legend),
+          yKeys.map(function(k,i){ return h(RC.Area, {key:k, type:'monotone', dataKey:k, stroke:COLORS[i%COLORS.length], fill:COLORS[i%COLORS.length], fillOpacity:0.3, strokeWidth:2}); })
+        );
+      } else if (chartType === 'line') {
+        inner = h(RC.LineChart, { data:rows, margin:margin },
+          h(RC.CartesianGrid, {strokeDasharray:'3 3'}), h(RC.XAxis, {dataKey:xKey, fontSize:11}), h(RC.YAxis, {fontSize:11}),
+          h(RC.Tooltip), h(RC.Legend),
+          yKeys.map(function(k,i){ return h(RC.Line, {key:k, type:'monotone', dataKey:k, stroke:COLORS[i%COLORS.length], strokeWidth:2, dot:false}); })
+        );
+      } else {
+        inner = h(RC.BarChart, { data:rows, margin:margin },
+          h(RC.CartesianGrid, {strokeDasharray:'3 3'}), h(RC.XAxis, {dataKey:xKey, fontSize:11}), h(RC.YAxis, {fontSize:11}),
+          h(RC.Tooltip), h(RC.Legend),
+          yKeys.map(function(k,i){ return h(RC.Bar, {key:k, dataKey:k, fill:COLORS[i%COLORS.length], radius:[4,4,0,0]}); })
+        );
+      }
+      return h('div',{className:'chart-area'}, h(RC.ResponsiveContainer, {width:'100%',height:360}, inner));
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       RENDER
+       ══════════════════════════════════════════════════════════════ */
+    return h('div', {className:'app'},
+
+      /* ── Header ────────────────────────────────────────────────── */
+      h('header', {className:'app-header'},
+        h('div', {className:'brand'},
+          h('div', {className:'brand-icon'}, 'F'),
+          h('h1', null, 'Ask ', h('span', null, 'Finnie'))
         ),
-        h('button', {
-          className: 'btn-chat-toggle' + (chatOpen ? ' active' : ''),
-          onClick: () => setChatOpen(prev => !prev)
-        }, '\u2728 Ask Finnie')
-      )
-    ),
-
-    // Main
-    h('main', { className: 'app-main' },
-      // Sidebar
-      h('aside', { className: 'sidebar' },
-        // Mode
-        h('div', { className: 'sidebar-section' },
-          h('div', { className: 'section-title' }, 'Data Source'),
-          h('div', { className: 'mode-tabs' },
-            h('button', { className: 'mode-tab' + (mode === 'tableContents' ? ' active' : ''), onClick: () => setMode('tableContents') }, 'CDS View'),
-            h('button', { className: 'mode-tab' + (mode === 'runQuery' ? ' active' : ''), onClick: () => setMode('runQuery') }, 'Custom SQL')
-          ),
-          mode === 'tableContents'
-            ? h('div', { className: 'field' },
-                h('label', null, 'CDS Model'),
-                h('select', { className: 'input', value: selectedView, onChange: e => setSelectedView(e.target.value) },
-                  h('option', { value: '' }, 'Select a view\u2026'),
-                  views.map(v => h('option', { key: v, value: v }, v))
-                )
-              )
-            : h('div', { className: 'field' },
-                h('label', null, 'SQL Query'),
-                h('textarea', { className: 'input mono', value: sql, onChange: e => setSql(e.target.value), placeholder: 'SELECT * FROM ZFIN_I_BILLRATE_V', rows: 4 })
-              )
-        ),
-
-        // Options
-        h('div', { className: 'sidebar-section' },
-          h('div', { className: 'section-title' }, 'Options'),
-          h('div', { className: 'options-row' },
-            h('div', { className: 'field field-inline' },
-              h('label', null, 'Max rows'),
-              h('input', { className: 'input input-number', type: 'number', min: 1, max: 10000, value: rowLimit, onChange: e => setRowLimit(Number(e.target.value) || 500) })
+        h('div', {className:'header-right'},
+          h('div', {className:'conn-badge', style: connError ? { flexDirection:'column', alignItems:'flex-end' } : {}},
+            h('div', {style:{ display:'flex', alignItems:'center', gap: '0.5rem' }},
+              h('span', {className:'conn-dot '+(connected===null?'pending':connected?'ok':'fail')}),
+              connected===null ? 'Checking...' : connected ? 'SAP: Connected' : 'SAP: Not connected',
+              !connected && connected!==null ? h('button',{className:'btn-retry',onClick:checkConn},'Retry') : null
             ),
-            h('label', { className: 'checkbox-wrap' },
-              h('input', { type: 'checkbox', checked: decode, onChange: e => setDecode(e.target.checked) }),
-              'Decode'
-            )
-          )
-        ),
-
-        // Run
-        h('div', { className: 'sidebar-section' },
-          h('button', {
-            className: 'btn-run',
-            onClick: runQuery,
-            disabled: loading || (mode === 'tableContents' ? !selectedView : !sql.trim())
-          }, loading ? h(Fragment, null, h('span', { className: 'spinner', style: { marginRight: 8, verticalAlign: 'middle' } }), 'Running\u2026') : '\u25B6  Run Query'),
-          error && h('div', { className: 'error-box' }, error)
+            connError ? h('div', {style:{ fontSize:'0.7rem', color:'var(--text-muted)', marginTop:'0.25rem', maxWidth:'220px', textAlign:'right' }, title: connError}, connError) : null
+          ),
+          h('button', {className:'btn-chat-toggle'+(chatOpen?' active':''), onClick:function(){setChatOpen(function(p){return !p});}}, '\u2728 Ask Finnie')
         )
       ),
 
-      // Content
-      h('div', { className: 'content' },
-        h('div', { className: 'content-tabs' },
-          h('button', { className: 'content-tab' + (activeTab === 'table' ? ' active' : ''), onClick: () => setActiveTab('table') },
-            'Table', rows.length > 0 && h('span', { className: 'badge' }, rows.length)
-          ),
-          h('button', { className: 'content-tab' + (activeTab === 'chart' ? ' active' : ''), onClick: () => setActiveTab('chart') }, 'Chart')
-        ),
+      /* ── Main ──────────────────────────────────────────────────── */
+      h('main', {className:'app-main'},
 
-        activeTab === 'table'
-          ? h('div', { className: 'tab-content' },
-              loading
-                ? h('div', { className: 'loading-bar' }, h('span', { className: 'spinner' }), 'Loading data\u2026')
-                : !columns.length
-                  ? h('div', { className: 'results-empty' },
-                      h('div', null,
-                        h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5 },
-                          h('path', { d: 'M3 10h18M3 14h18M3 6h18M3 18h18' })
-                        ),
-                        h('div', null, 'Run a query to see results here')
-                      )
-                    )
-                  : h(Fragment, null,
-                      h('div', { className: 'results-scroll' },
-                        h('table', { className: 'results-table' },
-                          h('thead', null, h('tr', null, columns.map(c => h('th', { key: c }, c)))),
-                          h('tbody', null, rows.map((row, i) =>
-                            h('tr', { key: i }, columns.map(c =>
-                              h('td', { key: c, title: row[c] != null ? String(row[c]) : '' }, row[c] != null ? String(row[c]) : '\u2014')
-                            ))
-                          ))
-                        )
-                      ),
-                      h('div', { className: 'results-footer' },
-                        h('span', null, rows.length + ' row' + (rows.length !== 1 ? 's' : '') + ' \u00b7 ' + columns.length + ' columns'),
-                        h('span', null, selectedView || 'SQL query')
-                      )
-                    )
-            )
-          : h('div', { className: 'tab-content' },
-              // Chart config
-              h('div', { className: 'chart-config' },
-                h('div', { className: 'field' },
-                  h('label', null, 'Chart type'),
-                  h('select', { className: 'input', value: chartType, onChange: e => setChartType(e.target.value) },
-                    CHART_TYPES.map(t => h('option', { key: t, value: t }, t[0].toUpperCase() + t.slice(1)))
-                  )
-                ),
-                h('div', { className: 'field' },
-                  h('label', null, 'X axis'),
-                  h('select', { className: 'input', value: xKey, onChange: e => setXKey(e.target.value) },
-                    h('option', { value: '' }, '\u2014'),
-                    columns.map(c => h('option', { key: c, value: c }, c))
-                  )
-                ),
-                h('div', { className: 'field' },
-                  h('label', null, 'Y measures'),
-                  h('div', { className: 'chips' },
-                    (numericCols.length ? numericCols : columns).map(c =>
-                      h('label', { key: c, className: 'chip' + (yKeys.includes(c) ? ' selected' : ''), onClick: () => toggleY(c) },
-                        h('input', { type: 'checkbox', readOnly: true, checked: yKeys.includes(c) }),
-                        c
-                      )
-                    )
+        /* Sidebar */
+        h('aside', {className:'sidebar'},
+          h('div', {className:'sidebar-section'},
+            h('div', {className:'section-title'}, 'Data Source'),
+            h('div', {className:'mode-tabs'},
+              h('button', {className:'mode-tab'+(mode==='tableContents'?' active':''), onClick:function(){setMode('tableContents');}}, 'CDS View'),
+              h('button', {className:'mode-tab'+(mode==='runQuery'?' active':''), onClick:function(){setMode('runQuery');}}, 'Custom SQL')
+            ),
+            mode === 'tableContents'
+              ? h('div', {className:'field'},
+                  h('label', null, 'CDS Model'),
+                  h('select', {className:'input', value:selectedView, onChange:function(e){setSelectedView(e.target.value); setRawResult(null); setError(null); setXKey(''); setYKeys([]); }},
+                    h('option', {value:''}, 'Select a view\u2026'),
+                    views.map(function(v){ return h('option', {key:v, value:v}, v); })
                   )
                 )
+              : h('div', {className:'field'},
+                  h('label', null, 'SQL Query'),
+                  h('textarea', {className:'input mono', value:sql, onChange:function(e){setSql(e.target.value);}, placeholder:'SELECT * FROM ZFIN_I_BILLRATE_V', rows:4})
+                )
+          ),
+          h('div', {className:'sidebar-section'},
+            h('div', {className:'section-title'}, 'Options'),
+            h('div', {className:'options-row'},
+              h('div', {className:'field field-inline'},
+                h('label', null, 'Max rows'),
+                h('input', {className:'input input-number', type:'number', min:1, max:10000, value:rowLimit, onChange:function(e){setRowLimit(Number(e.target.value)||500);}})
               ),
-
-              // Chart
-              h('div', { className: 'chart-area' },
-                (!xKey || !yKeys.length)
-                  ? h('div', { className: 'chart-placeholder' }, 'Select an X axis and at least one Y measure to build a chart.')
-                  : h(ResponsiveContainer, { width: '100%', height: 360 },
-                      chartType === 'pie'
-                        ? h(PieChart, null,
-                            h(Pie, { data: rows, dataKey: yKeys[0], nameKey: xKey, cx: '50%', cy: '50%', outerRadius: '70%', label: true },
-                              rows.map((_, i) => h(Cell, { key: i, fill: COLORS[i % COLORS.length] }))
-                            ),
-                            h(Tooltip, null), h(Legend, null)
-                          )
-                        : chartType === 'area'
-                          ? h(AreaChart, { data: rows, margin: { top: 10, right: 20, left: 0, bottom: 0 } },
-                              h(CartesianGrid, { strokeDasharray: '3 3' }),
-                              h(XAxis, { dataKey: xKey, fontSize: 11 }),
-                              h(YAxis, { fontSize: 11 }),
-                              h(Tooltip, null), h(Legend, null),
-                              yKeys.map((k, i) => h(Area, { key: k, type: 'monotone', dataKey: k, stroke: COLORS[i % COLORS.length], fill: COLORS[i % COLORS.length], fillOpacity: 0.3, strokeWidth: 2 }))
-                            )
-                          : chartType === 'line'
-                            ? h(LineChart, { data: rows, margin: { top: 10, right: 20, left: 0, bottom: 0 } },
-                                h(CartesianGrid, { strokeDasharray: '3 3' }),
-                                h(XAxis, { dataKey: xKey, fontSize: 11 }),
-                                h(YAxis, { fontSize: 11 }),
-                                h(Tooltip, null), h(Legend, null),
-                                yKeys.map((k, i) => h(Line, { key: k, type: 'monotone', dataKey: k, stroke: COLORS[i % COLORS.length], strokeWidth: 2, dot: false }))
-                              )
-                            : h(BarChart, { data: rows, margin: { top: 10, right: 20, left: 0, bottom: 0 } },
-                                h(CartesianGrid, { strokeDasharray: '3 3' }),
-                                h(XAxis, { dataKey: xKey, fontSize: 11 }),
-                                h(YAxis, { fontSize: 11 }),
-                                h(Tooltip, null), h(Legend, null),
-                                yKeys.map((k, i) => h(Bar, { key: k, dataKey: k, fill: COLORS[i % COLORS.length], radius: [4, 4, 0, 0] }))
-                              )
-                    )
+              h('label', {className:'checkbox-wrap'},
+                h('input', {type:'checkbox', checked:decode, onChange:function(e){setDecode(e.target.checked);}}),
+                'Decode'
               )
             )
-      )
-    ),
-
-    // ─── Chat Pane ─────────────────────────────────────────────────
-    h('div', { className: 'chat-pane' + (chatOpen ? ' open' : '') },
-      h('div', { className: 'chat-header' },
-        h('div', { className: 'chat-header-left' },
-          h('div', { className: 'chat-header-icon' }, 'F'),
-          h('h3', null, 'Ask ', h('span', null, 'Finnie'))
-        ),
-        h('button', { className: 'btn-close-chat', onClick: () => setChatOpen(false) }, '\u2715')
-      ),
-      h('div', { className: 'chat-messages' },
-        chatMessages.map((msg, i) =>
-          h('div', { key: i, className: 'chat-msg ' + msg.role },
-            h('div', { className: 'chat-bubble' },
-              msg.content.split('\n').map((line, j) => h(Fragment, { key: j }, j > 0 && h('br'), line)),
-              msg.sql && h('div', null,
-                h('div', { className: 'chat-sql-label' }, 'Generated SQL'),
-                h('div', { className: 'chat-sql' }, msg.sql)
-              ),
-              msg.queryError && h('div', { className: 'chat-error-badge' }, 'Query error: ' + msg.queryError),
-              msg.data && h('div', { className: 'chat-data-badge', onClick: () => loadChatData(msg) },
-                '\u2714 Data loaded \u00b7 Click to view in table'
-              )
-            )
+          ),
+          h('div', {className:'sidebar-section'},
+            h('button', {className:'btn-run', onClick:runQuery, disabled: loading||(mode==='tableContents'?!selectedView:!sql.trim())},
+              loading ? h(F, null, h('span',{className:'spinner',style:{marginRight:8,verticalAlign:'middle'}}), 'Running\u2026') : '\u25B6  Run Query'
+            ),
+            error ? h('div', {className:'error-box'}, error) : null
           )
         ),
-        chatLoading && h('div', { className: 'chat-typing' }, h('span'), h('span'), h('span')),
-        h('div', { ref: chatEndRef })
-      ),
-      h('div', { className: 'chat-input-area' },
-        h('div', { className: 'chat-input-row' },
-          h('textarea', {
-            className: 'chat-input',
-            value: chatInput,
-            onChange: e => setChatInput(e.target.value),
-            onKeyDown: handleChatKey,
-            placeholder: 'Ask Finnie about your data\u2026',
-            rows: 1,
-            disabled: chatLoading
-          }),
-          h('button', {
-            className: 'btn-send',
-            onClick: sendChat,
-            disabled: !chatInput.trim() || chatLoading
-          }, chatLoading ? '\u2026' : 'Send')
-        ),
-        h('div', { className: 'chat-hint' }, 'Press Enter to send \u00b7 Shift+Enter for new line')
-      )
-    )
-  );
-}
 
-ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+        /* Content */
+        h('div', {className:'content'},
+          h('div', {className:'content-tabs'},
+            h('button', {className:'content-tab'+(activeTab==='table'?' active':''), onClick:function(){setActiveTab('table');}},
+              'Table', rows.length>0 ? h('span',{className:'badge'},rows.length) : null
+            ),
+            h('button', {className:'content-tab'+(activeTab==='chart'?' active':''), onClick:function(){setActiveTab('chart');}}, 'Chart')
+          ),
+          activeTab === 'table'
+            ? h('div', {className:'tab-content'},
+                loading
+                  ? h('div',{className:'loading-bar'}, h('span',{className:'spinner'}), 'Loading data\u2026')
+                  : !columns.length
+                    ? h('div',{className:'results-empty'}, h('div', null,
+                        h('svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.5}, h('path',{d:'M3 10h18M3 14h18M3 6h18M3 18h18'})),
+                        h('div',null,'Run a query to see results here')
+                      ))
+                    : h(F, null,
+                        h('div',{className:'results-scroll'},
+                          h('table',{className:'results-table'},
+                            h('thead',null, h('tr',null, columns.map(function(c){return h('th',{key:c},c);}))),
+                            h('tbody',null, rows.map(function(row,i){
+                              return h('tr',{key:i}, columns.map(function(c){
+                                return h('td',{key:c,title:row[c]!=null?String(row[c]):''}, row[c]!=null?String(row[c]):'\u2014');
+                              }));
+                            }))
+                          )
+                        ),
+                        h('div',{className:'results-footer'},
+                          h('span',null, rows.length+' row'+(rows.length!==1?'s':'')+' \u00b7 '+columns.length+' columns'),
+                          h('span',null, selectedView||'SQL query')
+                        )
+                      )
+              )
+            : h('div', {className:'tab-content'},
+                HAS_CHARTS ? h('div',{className:'chart-config'},
+                  h('div',{className:'field'},
+                    h('label',null,'Chart type'),
+                    h('select',{className:'input',value:chartType,onChange:function(e){setChartType(e.target.value);}},
+                      CHART_TYPES.map(function(t){return h('option',{key:t,value:t},t[0].toUpperCase()+t.slice(1));})
+                    )
+                  ),
+                  h('div',{className:'field'},
+                    h('label',null,'X axis'),
+                    h('select',{className:'input',value:xKey,onChange:function(e){setXKey(e.target.value);}},
+                      h('option',{value:''},'\u2014'),
+                      columns.map(function(c){return h('option',{key:c,value:c},c);})
+                    )
+                  ),
+                  h('div',{className:'field'},
+                    h('label',null,'Y measures'),
+                    h('div',{className:'chips'},
+                      (numericCols.length ? numericCols : columns).map(function(c){
+                        return h('span',{key:c,className:'chip'+(yKeys.indexOf(c)>=0?' selected':''),onClick:function(){toggleY(c);}},
+                          c
+                        );
+                      })
+                    )
+                  )
+                ) : null,
+                renderChart()
+              )
+        )
+      ),
+
+      /* ── Chat Pane ─────────────────────────────────────────────── */
+      h('div', {className:'chat-pane'+(chatOpen?' open':'')},
+        h('div', {className:'chat-header'},
+          h('div', {className:'chat-header-left'},
+            h('div', {className:'chat-header-icon'}, 'F'),
+            h('h3', null, 'Ask ', h('span',null,'Finnie'))
+          ),
+          h('button', {className:'btn-close-chat', onClick:function(){setChatOpen(false);}}, '\u2715')
+        ),
+        h('div', {className:'chat-messages'},
+          chatMessages.map(function(msg,i) {
+            return h('div', {key:i, className:'chat-msg '+msg.role},
+              h('div', {className:'chat-bubble'},
+                msg.content.split('\n').map(function(line,j){ return h(F,{key:j}, j>0?h('br'):null, line); }),
+                msg.sql ? h('div',null,
+                  h('div',{className:'chat-sql-label'},'Generated SQL'),
+                  h('div',{className:'chat-sql'},msg.sql)
+                ) : null,
+                msg.queryError ? h('div',{className:'chat-error-badge'},'Query error: '+msg.queryError) : null,
+                msg.data ? h('div',{className:'chat-data-badge',onClick:function(){loadChatData(msg);}},
+                  '\u2714 Data loaded \u00b7 Click to view in table'
+                ) : null
+              )
+            );
+          }),
+          chatLoading ? h('div',{className:'chat-typing'}, h('span'), h('span'), h('span')) : null,
+          h('div', {ref:chatEndRef})
+        ),
+        h('div', {className:'chat-input-area'},
+          h('div', {className:'chat-input-row'},
+            h('textarea', {className:'chat-input', value:chatInput, onChange:function(e){setChatInput(e.target.value);}, onKeyDown:handleChatKey, placeholder:'Ask Finnie about your data\u2026', rows:1, disabled:chatLoading}),
+            h('button', {className:'btn-send', onClick:sendChat, disabled:!chatInput.trim()||chatLoading}, chatLoading?'\u2026':'Send')
+          ),
+          h('div', {className:'chat-hint'}, 'Press Enter to send \u00b7 Shift+Enter for new line')
+        )
+      )
+    );
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     MOUNT
+     ═══════════════════════════════════════════════════════════════════ */
+  var rootEl = document.getElementById('root');
+  try {
+    if (ReactDOM.createRoot) {
+      ReactDOM.createRoot(rootEl).render(h(App));
+    } else {
+      ReactDOM.render(h(App), rootEl);
+    }
+  } catch (err) {
+    var errDiv = document.getElementById('boot-error');
+    errDiv.style.display = 'block';
+    errDiv.textContent = 'App crashed during render:\n\n' + err.message + '\n\n' + err.stack;
+    rootEl.innerHTML = '';
+    console.error('Ask Finnie fatal:', err);
+  }
+
+})();
 </script>
 </body>
 </html>
